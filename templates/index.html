@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium tracker for Google Cloud BigQuery Release Notes. Fetch, filter, search and share the latest updates.">
+    <title>BigQuery Release Notes Tracker</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" width="32" height="32">
+                        <polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>BigQuery</h1>
+                    <span>Release Notes Tracker</span>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="sync-status" id="sync-status">
+                    <span class="status-dot green"></span>
+                    <span class="status-text" id="last-updated">Last sync: Never</span>
+                </div>
+                <button class="btn btn-primary btn-refresh" id="btn-refresh" title="Refresh feed">
+                    <svg class="icon spinner-icon" viewBox="0 0 24 24" width="20" height="20">
+                        <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace -->
+        <main class="app-main">
+            <!-- Sidebar Filters -->
+            <aside class="sidebar">
+                <div class="search-box">
+                    <label for="search-input" class="sr-only">Search updates</label>
+                    <div class="input-container">
+                        <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18">
+                            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search release notes...">
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <h3>Filter by Type</h3>
+                    <div class="filter-buttons" id="filter-buttons">
+                        <button class="filter-btn active" data-type="all">
+                            <span class="btn-label">All Updates</span>
+                            <span class="badge count-badge" id="count-all">0</span>
+                        </button>
+                        <button class="filter-btn" data-type="Feature">
+                            <span class="badge-dot feature"></span>
+                            <span class="btn-label">Features</span>
+                            <span class="badge count-badge" id="count-feature">0</span>
+                        </button>
+                        <button class="filter-btn" data-type="Change">
+                            <span class="badge-dot change"></span>
+                            <span class="btn-label">Changes</span>
+                            <span class="badge count-badge" id="count-change">0</span>
+                        </button>
+                        <button class="filter-btn" data-type="Announcement">
+                            <span class="badge-dot announcement"></span>
+                            <span class="btn-label">Announcements</span>
+                            <span class="badge count-badge" id="count-announcement">0</span>
+                        </button>
+                        <button class="filter-btn" data-type="Breaking">
+                            <span class="badge-dot breaking"></span>
+                            <span class="btn-label">Breaking</span>
+                            <span class="badge count-badge" id="count-breaking">0</span>
+                        </button>
+                        <button class="filter-btn" data-type="Issue">
+                            <span class="badge-dot issue"></span>
+                            <span class="btn-label">Issues</span>
+                            <span class="badge count-badge" id="count-issue">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="stats-section">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stats-total">0</div>
+                        <div class="stat-label">Total Items Listed</div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Feed Content -->
+            <section class="feed-section">
+                <!-- Shimmer / Loading State -->
+                <div class="loading-state" id="loading-state">
+                    <div class="shimmer-card">
+                        <div class="shimmer-line header"></div>
+                        <div class="shimmer-line paragraph"></div>
+                        <div class="shimmer-line paragraph"></div>
+                    </div>
+                    <div class="shimmer-card">
+                        <div class="shimmer-line header"></div>
+                        <div class="shimmer-line paragraph"></div>
+                    </div>
+                    <div class="shimmer-card">
+                        <div class="shimmer-line header"></div>
+                        <div class="shimmer-line paragraph"></div>
+                        <div class="shimmer-line paragraph"></div>
+                    </div>
+                </div>
+
+                <!-- Empty state -->
+                <div class="empty-state hidden" id="empty-state">
+                    <svg viewBox="0 0 24 24" width="64" height="64">
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z" fill="currentColor"/>
+                    </svg>
+                    <h3>No release notes found</h3>
+                    <p>Try resetting your filter, typing a different search query, or refreshing the feed.</p>
+                </div>
+
+                <!-- Feed Updates -->
+                <div class="feed-container hidden" id="feed-container">
+                    <!-- Cards will be dynamically inserted here -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Tweet Modal -->
+    <div class="modal-overlay hidden" id="tweet-modal">
+        <div class="modal-container">
+            <header class="modal-header">
+                <h2>Share on Twitter</h2>
+                <button class="btn-close" id="btn-close-modal">
+                    <svg viewBox="0 0 24 24" width="24" height="24">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </header>
+            <div class="modal-body">
+                <p class="modal-desc">Customize your tweet content before sharing to Twitter/X.</p>
+                
+                <div class="tweet-editor-container">
+                    <textarea id="tweet-textarea" maxlength="280" placeholder="What's happening?"></textarea>
+                    <div class="tweet-counter-container">
+                        <span id="tweet-char-count">0/280</span>
+                    </div>
+                </div>
+
+                <div class="tweet-preview-label">Live Preview</div>
+                <div class="tweet-preview-card">
+                    <div class="tweet-author">
+                        <div class="author-avatar">BQ</div>
+                        <div class="author-info">
+                            <span class="author-name">BigQuery Updates</span>
+                            <span class="author-handle">@BigQueryNotes</span>
+                        </div>
+                    </div>
+                    <div class="tweet-preview-text" id="tweet-preview-text">
+                        <!-- Live preview text -->
+                    </div>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button class="btn btn-secondary" id="btn-copy-tweet">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z" fill="currentColor"/>
+                    </svg>
+                    <span>Copy Text</span>
+                </button>
+                <button class="btn btn-primary btn-tweet-intent" id="btn-publish-tweet">
+                    <svg viewBox="0 0 24 24" width="18" height="18">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/>
+                    </svg>
+                    <span>Tweet now</span>
+                </button>
+            </footer>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div class="toast hidden" id="toast">
+        <span id="toast-message">Message copied!</span>
+    </div>
+
+    <!-- Custom JS -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
